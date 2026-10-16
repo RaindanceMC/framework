@@ -6,7 +6,7 @@
 
     <groupId>de.raindancer.modules</groupId>
     <artifactId>rains-flexible-modules</artifactId>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
     <packaging>pom</packaging>
 
     <name>Rain's Flexible Modules</name>
@@ -103,121 +103,6 @@
     <modules>
         <module>modules-api</module>
         <module>modules-wrapper</module>
-        <module>claims-module</module>
-        <module>claims-standalone</module>
-        <module>moderation-module</module>
-        <module>moderation-standalone</module>
-        <module>names-module</module>
-        <module>names-standalone</module>
-        <module>cosmetics-module</module>
-        <module>cosmetics-standalone</module>
-        <module>warp-module</module>
-        <module>warp-standalone</module>
-        <module>homes-module</module>
-        <module>homes-standalone</module>
-        <module>tpa-module</module>
-        <module>tpa-standalone</module>
-        <module>essentials-module</module>
-        <module>essentials-standalone</module>
-        <module>chat-module</module>
-        <module>chat-standalone</module>
-        <module>farmworld-module</module>
-        <module>farmworld-standalone</module>
-        <module>pack-module</module>
-        <module>pack-standalone</module>
-        <module>rtp-module</module>
-        <module>rtp-standalone</module>
-        <module>mannequin-module</module>
-        <module>mannequin-standalone</module>
-        <module>worldgate-module</module>
-        <module>worldgate-standalone</module>
-        <!-- After worldgate-module: the bundle shades both. -->
-        <module>worldutils-module</module>
-        <module>worldutils-bundle</module>
-        <module>invsnap-module</module>
-        <module>invsnap-standalone</module>
-        <module>xpbottle-module</module>
-        <module>xpbottle-standalone</module>
-        <module>sends-module</module>
-        <module>sends-standalone</module>
-        <module>oneblock-module</module>
-        <module>oneblock-standalone</module>
-        <module>twitch-module</module>
-        <module>twitch-standalone</module>
-        <module>arena-api</module>
-        <module>arena-module</module>
-        <module>arena-standalone</module>
-        <module>arenagate-module</module>
-        <module>arenagate-standalone</module>
-        <module>veintoggle-module</module>
-        <module>veintoggle-standalone</module>
-        <module>healthbars-module</module>
-        <module>healthbars-standalone</module>
-        <module>ctf-module</module>
-        <module>ctf-standalone</module>
-        <module>enchants-module</module>
-        <module>enchants-standalone</module>
-        <module>performance-module</module>
-        <module>performance-standalone</module>
-        <module>economy-module</module>
-        <module>economy-standalone</module>
-        <module>roles-module</module>
-        <module>roles-standalone</module>
-        <module>ranks-module</module>
-        <module>ranks-standalone</module>
-        <module>jobs-module</module>
-        <module>jobs-standalone</module>
-        <module>guilds-module</module>
-        <module>guilds-standalone</module>
-        <module>playerutils-module</module>
-        <module>playerutils-standalone</module>
-        <module>voicebridge-module</module>
-        <module>voicebridge-standalone</module>
-        <!-- After claims-module: it compiles against it (provided, never shaded) for the seam in
-             de.raindancer.modules.xaeromap.claims, and a reactor builds in the order it is given. -->
-        <module>xaeromap-module</module>
-        <module>xaeromap-standalone</module>
-        <!-- Back in the reactor 25.08.2026: the RainsCore API this was written against landed in
-             RainsCore 1.31.0 (world.geometry, world.build, world.selection, world.visual). After
-             claims-module and xaeromap-module: it compiles against both (provided, never shaded)
-             for the seams in .claims and .map, and a reactor builds in the order it is given. -->
-        <module>wallsroads-module</module>
-        <module>wallsroads-standalone</module>
-
-        <!-- Before chained-module: chained-module depends on speedrun-module's engine classes, and a
-             reactor builds in the order it is given. -->
-        <module>speedrun-module</module>
-        <module>speedrun-standalone</module>
-        <module>chained-module</module>
-        <module>chained-standalone</module>
-
-        <!-- Manhunt is part of speedrun-module now (de.raindancer.modules.speedrun.manhunt); the old
-             manhunt-module and manhunt-standalone are no longer built. -->
-        <!-- After speedrun, worldgate and worldutils: it shades them. -->
-        <module>speedrun-bundle</module>
-        <!--
-          End-to-end: a real Paper server and headless bots. The harness is generic; speedrun-e2e holds
-          RainsSpeedrun's scenarios and only runs them with -Pe2e (scripts/e2e.sh) — a normal build
-          compiles them and checks that every command, button and setting has one.
-        -->
-        <!-- The Velocity side of a network: not a module, a proxy plugin of its own. -->
-        <module>network-proxy</module>
-        <module>e2e-harness</module>
-        <module>speedrun-e2e</module>
-        <module>modules-e2e</module>
-        <!--
-          Archived 2026-08-14: not being worked on for a while, and there is no value in the reactor
-          spending a build and 850+ tests on it every push in the meantime. The code is untouched on
-          disk — re-add these three lines (and the matching CI lines noted in build.yml) to resume.
-        <module>hungergames-module</module>
-        <module>hungergames-standalone</module>
-        <module>hungergames-bundle</module>
-        -->
-        <!--
-          Last, because it shades six of the modules above and a reactor builds in the order it is
-          given. Every dependency it has is built by the time it is reached.
-        -->
-        <module>yeuksmp</module>
     </modules>
 
     <repositories>
@@ -654,6 +539,35 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <!--
+              What is published stands on its own: the deployed pom has its version and its dependencies written
+              out and no parent, so a consumer in another repository needs nothing but the artifact itself. Without
+              it, every module's pom would point at its repository's build pom, which is never published.
+            -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.7.0</version>
+                <configuration>
+                    <flattenMode>defaults</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten-clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
