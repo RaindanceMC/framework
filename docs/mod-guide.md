@@ -113,8 +113,12 @@ and on every report card / `/mod <player>`. An x-ray report: "Show their tunnels
 ## Staff
 | Command | What |
 |---|---|
-| `/promote <player> [Trial Mod\|Mod\|Admin]` · `/demote <player>` | Ranks |
+| `/promote <player> [support\|mod\|admin\|owner]` | A rung (replaces their rung) |
+| `/promote <player> builder\|creator\|dev\|tester` | A department (on top) |
+| `/demote <player>` · `/demote <player> <rank>` · `/demote <player> none` | One rung down · that rank · off the staff |
 | `/protect` · `/unprotect <player>` | Shield from mods (console only) |
-| `/lp editor` | LuckPerms web editor |
+| `/lp editor` | What each rank may do — every rank is the LuckPerms group of its name |
+
+Ladder support → mod → admin → owner, each inheriting the one below; departments stand on their own.
 
 Anti-cheat never punishes by itself: look at the evidence, then decide.
