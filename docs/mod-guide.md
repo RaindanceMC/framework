@@ -125,7 +125,7 @@ and on every report card / `/mod <player>`. An x-ray report: "Show their tunnels
 | `/voicebridge staff` · `/voicebridge general` | Join the staff voice group (there while staff are on) · the General group |
 
 Ladder support → mod → admin → owner, each inheriting the one below; departments stand on their own.
-With "Staff powers only in admin mode" on (`/settings` → Moderation → Staff), staff are ordinary players until
+With "Staff powers only in admin mode" on (`/settings` → Moderation → Staff → On duty), staff are ordinary players until
 `/admin` — a rank's powers are its LuckPerms nodes with context `rains:powers=on`. Nobody gets WorldEdit by default.
 
 Anti-cheat never punishes by itself: look at the evidence, then decide.
