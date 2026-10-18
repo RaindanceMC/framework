@@ -119,6 +119,13 @@ and on every report card / `/mod <player>`. An x-ray report: "Show their tunnels
 | `/protect` · `/unprotect <player>` | Shield from mods (console only) |
 | `/lp editor` | What each rank may do — every rank is the LuckPerms group of its name |
 
+| `/admin` · `/admin <player>` | Admin mode, yours · somebody else's (admins) |
+| `/dev` | Dev mode: every permission except WorldEdit, devs only |
+| `/whitelist add\|remove <player>` | Mods and up; one list for every server that shares it (`/settings` → Moderation → Whitelist) |
+| `/voicebridge staff` · `/voicebridge general` | Join the staff voice group (there while staff are on) · the General group |
+
 Ladder support → mod → admin → owner, each inheriting the one below; departments stand on their own.
+With "Staff powers only in admin mode" on (`/settings` → Moderation → Staff), staff are ordinary players until
+`/admin` — a rank's powers are its LuckPerms nodes with context `rains:powers=on`. Nobody gets WorldEdit by default.
 
 Anti-cheat never punishes by itself: look at the evidence, then decide.
