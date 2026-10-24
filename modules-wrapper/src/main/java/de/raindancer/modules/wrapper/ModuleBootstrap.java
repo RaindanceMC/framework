@@ -71,6 +71,14 @@ public final class ModuleBootstrap implements PluginBootstrap {
             // And one /changelog: what changed, told to returning players once. Publishing is
             // rainscore.changelog.manage, op-only like every undeclared Core node.
             de.raindancer.core.platform.command.CoreCommands.changelog(event.registrar());
+            // One /help (aliases /?, /guide): the guide — every module's rains-help pages, as dialog windows, with
+            // this server's settings filled in. Taken by the first plugin that asks, like /commands. Guarded: a plugin
+            // built against Core 2.4.0 must still start on an older Core, just without the guide.
+            try {
+                de.raindancer.core.platform.command.CoreCommands.help(event.registrar());
+            } catch (LinkageError olderCore) {
+                context.getLogger().warn("RainsCore is older than 2.4.0: there is no /help guide until it is updated.");
+            }
             // One /hub (alias /smp): the front door to every module, built from what they report. Core
             // declines every plugin but the first, so any mix of installed plugins still means one hub.
             de.raindancer.core.platform.command.CoreCommands.hub(event.registrar());
