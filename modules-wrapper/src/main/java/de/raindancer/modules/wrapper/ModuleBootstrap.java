@@ -27,6 +27,17 @@ public final class ModuleBootstrap implements PluginBootstrap {
 
     @Override
     public void bootstrap(BootstrapContext context) {
+        // A plugin it requires is missing: Paper will refuse this plugin after bootstrapping it, and commands left
+        // behind by it stop the whole server while its help index is built. So nothing is registered — no command, no
+        // enchantment, not even the shared /help or /hub, which then go to a plugin that does load. See RequiredPlugins.
+        java.nio.file.Path jar = context.getPluginSource().toAbsolutePath();
+        java.util.List<String> missing = RequiredPlugins.missing(RequiredPlugins.requiredBy(jar), jar.getParent());
+        if (!missing.isEmpty()) {
+            context.getLogger().error("{} needs {}, which is not installed. Paper will not load it, so it registers "
+                    + "no commands and the rest of the server starts without it.", context.getPluginMeta().getName(),
+                    String.join(", ", missing));
+            return;
+        }
         // The modules have to be found here rather than in onEnable, because their commands are needed now.
         // Discovery is idempotent, so onEnable calling it again costs nothing.
         Modules.discover(getClass().getClassLoader());
