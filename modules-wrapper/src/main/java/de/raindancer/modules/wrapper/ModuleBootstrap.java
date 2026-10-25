@@ -100,6 +100,13 @@ public final class ModuleBootstrap implements PluginBootstrap {
             de.raindancer.core.platform.command.CoreCommands.documents(event.registrar());
             // And one /network: the network's servers, and which one is the bank. Op-only through rainscore.network.
             de.raindancer.core.platform.command.CoreCommands.network(event.registrar());
+            // And one /screen (aliases /screens, /holo): screens floating in the world — every plugin's kinds, and
+            // everybody their own stats. Op-only through rainscore.screens. Guarded like /help: Core 2.10.0 or newer.
+            try {
+                de.raindancer.core.platform.command.CoreCommands.screens(event.registrar());
+            } catch (LinkageError olderCore) {
+                context.getLogger().warn("RainsCore is older than 2.10.0: there is no /screen until it is updated.");
+            }
         });
     }
 }
