@@ -107,6 +107,14 @@ public final class ModuleBootstrap implements PluginBootstrap {
             } catch (LinkageError olderCore) {
                 context.getLogger().warn("RainsCore is older than 2.10.0: there is no /screen until it is updated.");
             }
+            // And one /give that knows every plugin's items as well as vanilla's (/give Ada fishing:rod-void), with a
+            // "did you mean" for a typo; the rest goes to minecraft:give as typed. Vanilla's permission. Guarded:
+            // Core 2.33.0 or newer.
+            try {
+                de.raindancer.core.platform.command.CoreCommands.give(event.registrar());
+            } catch (LinkageError olderCore) {
+                context.getLogger().warn("RainsCore is older than 2.33.0: /give is vanilla's alone until it is updated.");
+            }
         });
     }
 }
