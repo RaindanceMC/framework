@@ -1,0 +1,6 @@
+id: demo
+title: Demo
+summary: A demo.
+sections:
+  - question: Fun?
+    text: It is fun, a well-known 1-10 range.

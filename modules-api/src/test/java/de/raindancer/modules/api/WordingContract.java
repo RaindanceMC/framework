@@ -320,6 +320,111 @@ public interface WordingContract {
         assertThat(broken).isEmpty();
     }
 
+    // ───────────────────────────────────────────────────────────── one plain tone
+
+    /** A dash standing in for punctuation: an em or en dash, or a hyphen with a space either side. */
+    Pattern DASH = Pattern.compile("[\u2013\u2014]|(?<=[A-Za-z>)]) -{1,2} (?=[A-Za-z<(])");
+    Pattern EMOJI = Pattern.compile("[\\x{1F000}-\\x{1FAFF}\u2728\u2705\u274C]");
+    /** !! or ?!, but not a regex's (?! nor a character class like [_!?]. */
+    Pattern SHOUT = Pattern.compile("(?<![(_+\\\\-])[!?]{2,}");
+    Pattern CHEER = Pattern.compile("(?i)\\b(oops|whoops|woohoo|hooray|yay|awesome|amazing|let's|have fun|enjoy|boom"
+            + "|not just|not only|not merely)\\b");
+    /** Lists whose jokes are the feature itself: essentials' roasts and jokes, afkcam's tips. */
+    Pattern JOKE_LISTS = Pattern.compile("(^|\\.)(jokes|roasts|tips)(\\[\\d+])?$");
+
+    /** What is wrong with one text: "dash", "emoji", "!!/?!", or the cheerful word in quotes. */
+    static List<String> plainProblems(String text, boolean phrases) {
+        List<String> found = new ArrayList<>();
+        if (DASH.matcher(text).find()) found.add("dash");
+        if (EMOJI.matcher(text).find()) found.add("emoji");
+        if (SHOUT.matcher(text).find()) found.add("!!/?!");
+        if (phrases) {
+            Matcher cheer = CHEER.matcher(text);
+            if (cheer.find()) found.add("'" + cheer.group() + "'");
+        }
+        return found;
+    }
+
+    /** The module's /help pages: {@code src/main/resources/rains-help}, beside the wording's package folders. */
+    default Path helpFolder() {
+        Path folder = messagesFile();
+        while (folder != null && folder.getFileName() != null && !folder.getFileName().toString().equals("resources")) {
+            folder = folder.getParent();
+        }
+        return folder == null ? messagesFile().resolveSibling("rains-help") : folder.resolve("rains-help");
+    }
+
+    @Test
+    @DisplayName("the wording says it plainly: no dashes, emoji, shouting or chatbot cheer")
+    default void wordingIsPlain() {
+        List<String> found = new ArrayList<>();
+        for (Map.Entry<String, String> line : wordingLines()) {
+            boolean phrases = !JOKE_LISTS.matcher(line.getKey()).find();
+            for (String problem : plainProblems(line.getValue(), phrases)) {
+                found.add(line.getKey() + ": " + problem + ": " + line.getValue().strip());
+            }
+        }
+        assertThat(found).as("say it the way a person would: a period, comma, colon or parentheses "
+                + "instead of a dash, and no decoration").isEmpty();
+    }
+
+    @Test
+    @DisplayName("there is one tone only, so messages-serious.yml has no lines")
+    default void oneToneOnly() {
+        if (Files.exists(seriousFile())) {
+            assertThat(wording(seriousFile()).keySet())
+                    .as("messages.yml is the plain wording; a second one only drifts from it")
+                    .isEmpty();
+        }
+    }
+
+    @Test
+    @DisplayName("the /help pages say it plainly")
+    default void helpIsPlain() {
+        if (!Files.isDirectory(helpFolder())) {
+            return;
+        }
+        List<String> found = new ArrayList<>();
+        try (Stream<Path> files = Files.list(helpFolder())) {
+            for (Path file : files.filter(path -> path.toString().endsWith(".yml")).sorted().toList()) {
+                for (Map.Entry<String, String> line : lines(wording(file))) {
+                    for (String problem : plainProblems(line.getValue(), true)) {
+                        found.add(file.getFileName() + ": " + line.getKey() + ": " + problem);
+                    }
+                }
+            }
+        } catch (IOException unreadable) {
+            throw new AssertionError("could not read " + helpFolder(), unreadable);
+        }
+        assertThat(found).isEmpty();
+    }
+
+    @Test
+    @DisplayName("no string in the sources has a dash, emoji or shouting")
+    default void sourceStringsArePlain() {
+        Pattern literal = Pattern.compile("\"\"\"(.*?)\"\"\"|\"((?:[^\"\\\\\\n]|\\\\.)*)\"", Pattern.DOTALL);
+        List<String> found = new ArrayList<>();
+        try (Stream<Path> files = Files.walk(moduleSource())) {
+            for (Path file : files.filter(path -> path.toString().endsWith(".java")).sorted().toList()) {
+                // Comments out, line breaks kept; a // inside a string ("https://") is not a comment.
+                String code = Pattern.compile("/\\*.*?\\*/", Pattern.DOTALL).matcher(Files.readString(file))
+                        .replaceAll(block -> "\n".repeat((int) block.group().chars().filter(c -> c == '\n').count()));
+                code = code.replaceAll("(?m)//[^\\n\"]*$", "").replaceAll("(?m)^\\s*//.*$", "");
+                Matcher string = literal.matcher(code);
+                while (string.find()) {
+                    String text = string.group(1) != null ? string.group(1) : string.group(2);
+                    for (String problem : plainProblems(text, false)) {
+                        found.add(file.getFileName() + ": " + problem + ": \"" + text.strip() + "\"");
+                    }
+                }
+            }
+        } catch (IOException unreadable) {
+            throw new AssertionError("could not read " + moduleSource(), unreadable);
+        }
+        assertThat(found).as("menus, lore, usage lines and log lines are read too; a usage line's remark "
+                + "follows \": \"").isEmpty();
+    }
+
     // ───────────────────────────────────────────────────────────── the reading
 
     /** What a client would actually draw for one line. */
