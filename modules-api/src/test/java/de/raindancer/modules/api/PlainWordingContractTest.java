@@ -3,7 +3,9 @@ package de.raindancer.modules.api;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Method;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -52,5 +54,13 @@ class PlainWordingContractTest {
         good.oneToneOnly();
         good.helpIsPlain();
         good.sourceStringsArePlain();
+    }
+
+    @Test
+    @DisplayName("a module needs no messages-serious.yml and no seriousFrom call any more")
+    void noSeriousWording() {
+        assertThat(Arrays.stream(WordingContract.class.getMethods()).map(Method::getName))
+                .noneMatch(name -> name.startsWith("serious"));
+        module("good").oneToneOnly();
     }
 }

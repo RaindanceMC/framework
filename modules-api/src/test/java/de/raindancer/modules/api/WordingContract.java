@@ -266,60 +266,6 @@ public interface WordingContract {
                 .anyMatch(source -> source.getValue().contains("defineFrom"));
     }
 
-    // ───────────────────────────────────────────────────────────── the serious wording
-
-    /** The plain-spoken twin of {@link #messagesFile()}, used when Core's Message tone is SERIOUS. */
-    default Path seriousFile() {
-        return messagesFile().resolveSibling("messages-serious.yml");
-    }
-
-    @Test
-    @DisplayName("there is a serious wording, and the module hands it over")
-    default void seriousWordingShipsAndIsRegistered() {
-        assertThat(seriousFile())
-                .as("a server set to the serious tone would still get this module's jokes")
-                .exists();
-        assertThat(sources())
-                .as("no source in %s calls Messages.seriousFrom, so messages-serious.yml is never read",
-                        moduleSource())
-                .anyMatch(source -> source.getValue().contains("seriousFrom"));
-    }
-
-    @Test
-    @DisplayName("every serious line is a key of messages.yml, with exactly its placeholders")
-    default void seriousWordingMatchesThePlayfulOne() {
-        Map<String, Object> playful = wording(messagesFile());
-        List<String> wrong = new ArrayList<>();
-        wording(seriousFile()).forEach((key, value) -> {
-            Object other = playful.get(key);
-            if (other == null) {
-                wrong.add(key + " is not in messages.yml, so it is never said");
-            } else if (other.equals(value)) {
-                wrong.add(key + " is identical to messages.yml");
-            } else if (!placeholders(other).equals(placeholders(value))) {
-                wrong.add(key + " has " + placeholders(value) + " where messages.yml has " + placeholders(other));
-            }
-        });
-        assertThat(wrong).isEmpty();
-    }
-
-    @Test
-    @DisplayName("no serious line shows a tag or fails to parse")
-    default void seriousWordingRenders() {
-        List<String> broken = new ArrayList<>();
-        for (Map.Entry<String, String> line : lines(wording(seriousFile()))) {
-            try {
-                String shown = asShown(line.getValue());
-                if (shown.contains("</")) {
-                    broken.add(line.getKey() + " renders as: " + shown);
-                }
-            } catch (RuntimeException unparseable) {
-                broken.add(line.getKey() + ": " + unparseable.getMessage());
-            }
-        }
-        assertThat(broken).isEmpty();
-    }
-
     // ───────────────────────────────────────────────────────────── one plain tone
 
     /** A dash standing in for punctuation: an em or en dash, or a hyphen with a space either side. */
@@ -373,10 +319,11 @@ public interface WordingContract {
     }
 
     @Test
-    @DisplayName("there is one tone only, so messages-serious.yml has no lines")
+    @DisplayName("there is one tone only, so a leftover messages-serious.yml has no lines")
     default void oneToneOnly() {
-        if (Files.exists(seriousFile())) {
-            assertThat(wording(seriousFile()).keySet())
+        Path serious = messagesFile().resolveSibling("messages-serious.yml");
+        if (Files.exists(serious)) {
+            assertThat(wording(serious).keySet())
                     .as("messages.yml is the plain wording; a second one only drifts from it")
                     .isEmpty();
         }
@@ -446,21 +393,6 @@ public interface WordingContract {
     /** A tag whose name is a placeholder, filled with a real colour the way {@code Messages} does. */
     private String filled(String miniMessage) {
         return TAG_FROM_A_PLACEHOLDER.matcher(miniMessage).replaceAll("<$1green>");
-    }
-
-    /** The placeholder names in a line or a list of lines — anything in angle brackets that is no colour. */
-    private static Set<String> placeholders(Object value) {
-        Set<String> found = new java.util.TreeSet<>();
-        Pattern placeholder = Pattern.compile("<([a-z][a-z0-9_-]*)>");
-        for (Object line : value instanceof List<?> many ? many : List.of(value)) {
-            Matcher matcher = placeholder.matcher(String.valueOf(line));
-            while (matcher.find()) {
-                if (!FORMATS.contains(matcher.group(1)) && !Set.of("u", "b", "i", "reset").contains(matcher.group(1))) {
-                    found.add(matcher.group(1));
-                }
-            }
-        }
-        return found;
     }
 
     private boolean isMarkup(String text) {
