@@ -1,6 +1,7 @@
 id: demo
 title: Demo
 summary: A demo.
+aliases: [demo, boom]
 sections:
   - question: Fun?
-    text: It is fun, a well-known 1-10 range.
+    text: It is fun, a well-known 1-10 range. {cmd:/boom} blows up.

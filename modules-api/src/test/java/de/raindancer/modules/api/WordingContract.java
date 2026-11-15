@@ -332,6 +332,10 @@ public interface WordingContract {
     /** Lists whose jokes are the feature itself: essentials' roasts and jokes, afkcam's tips. */
     Pattern JOKE_LISTS = Pattern.compile("(^|\\.)(jokes|roasts|tips)(\\[\\d+])?$");
 
+    /** Help keys that hold ids, search words and command names, not sentences. */
+    Pattern HELP_KEYS = Pattern.compile("^(aliases|keywords|commands|related|id|icon|category)(\\[\\d+])?$");
+    Pattern COMMAND_SYNTAX = Pattern.compile("\\{(cmd|run):[^}]*}");
+
     /** What is wrong with one text: "dash", "emoji", "!!/?!", or the cheerful word in quotes. */
     static List<String> plainProblems(String text, boolean phrases) {
         List<String> found = new ArrayList<>();
@@ -388,7 +392,14 @@ public interface WordingContract {
         try (Stream<Path> files = Files.list(helpFolder())) {
             for (Path file : files.filter(path -> path.toString().endsWith(".yml")).sorted().toList()) {
                 for (Map.Entry<String, String> line : lines(wording(file))) {
-                    for (String problem : plainProblems(line.getValue(), true)) {
+                    // Search words and command names are not prose: /boom stays /boom.
+                    boolean prose = !HELP_KEYS.matcher(line.getKey()).find();
+                    List<String> problems = new ArrayList<>(plainProblems(line.getValue(), false));
+                    if (prose) {
+                        plainProblems(COMMAND_SYNTAX.matcher(line.getValue()).replaceAll(""), true).stream()
+                                .filter(problem -> problem.startsWith("'")).forEach(problems::add);
+                    }
+                    for (String problem : problems) {
                         found.add(file.getFileName() + ": " + line.getKey() + ": " + problem);
                     }
                 }
