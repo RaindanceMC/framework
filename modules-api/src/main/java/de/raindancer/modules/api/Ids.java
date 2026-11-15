@@ -58,7 +58,7 @@ final class Ids {
         if (!MODULE_ID.matcher(value).matches()) {
             throw new IllegalArgumentException(
                     "a " + what + " is lower case letters, digits and single dashes, starting with a "
-                            + "letter — '" + value + "' is not");
+                            + "letter, and '" + value + "' is not");
         }
         return value;
     }

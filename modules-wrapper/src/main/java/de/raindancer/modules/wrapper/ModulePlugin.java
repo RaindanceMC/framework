@@ -164,7 +164,7 @@ public final class ModulePlugin extends JavaPlugin {
         String running = core.getPluginMeta().getVersion();
         if (CoreVersion.isOlder(running, built)) {
             getSLF4JLogger().error("This jar was built against RainsCore {}, but RainsCore {} is running. "
-                    + "Modules that need the newer Core will fail with NoSuchMethodError — put RainsCore {} "
+                    + "Modules that need the newer Core will fail with NoSuchMethodError. Put RainsCore {} "
                     + "or newer on the server.", built, running, built);
         }
     }
@@ -173,7 +173,7 @@ public final class ModulePlugin extends JavaPlugin {
         for (FlexModule module : Modules.registry().declared()) {
             String id = module.info().id();
             ModuleState state = Modules.registry().stateOf(id);
-            String because = Modules.registry().reasonFor(id).map(reason -> " — " + reason).orElse("");
+            String because = Modules.registry().reasonFor(id).map(reason -> ": " + reason).orElse("");
             switch (state) {
                 case ENABLED -> getSLF4JLogger().info("{} is running.", module.info());
                 case SKIPPED -> getSLF4JLogger().warn("{} was not started{}", module.info(), because);

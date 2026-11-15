@@ -147,7 +147,7 @@ public final class ModuleCommands {
         String because = registry.reasonFor(moduleId).map(reason -> ": " + reason).orElse("");
         return Optional.of(switch (state) {
             case ABSENT -> "The '" + moduleId + "' module is not installed on this server.";
-            case NEW -> "The '" + moduleId + "' module has not started yet — try again in a moment.";
+            case NEW -> "The '" + moduleId + "' module has not started yet. Try again in a moment.";
             case SKIPPED -> "The '" + moduleId + "' module was not started" + because + ".";
             case FAILED -> "The '" + moduleId + "' module failed to start" + because + ".";
             case DISABLED -> "The '" + moduleId + "' module is not running any more.";

@@ -51,7 +51,7 @@ public final class ModuleOrder {
             FlexModule existing = byId.putIfAbsent(id, module);
             if (existing != null && existing != module) {
                 problems.add("the module id '" + id + "' is already taken by " + existing.info()
-                        + " — ignoring " + module.info());
+                        + ", so " + module.info() + " is ignored");
             }
         }
 

@@ -43,7 +43,7 @@ public record ModuleInfo(String id, String name, String version, String descript
         if (!both.isEmpty()) {
             throw new IllegalArgumentException(
                     "module '" + id + "' both requires and merely wants " + both
-                            + " — it has to be one or the other");
+                            + ", but it has to be one or the other");
         }
     }
 

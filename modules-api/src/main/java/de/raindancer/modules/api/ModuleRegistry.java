@@ -131,7 +131,7 @@ public final class ModuleRegistry {
                 Optional<String> clash = command.names().stream().filter(taken::contains).findFirst();
                 if (clash.isPresent()) {
                     commandProblems.add("module '" + id + "' wanted /" + command.name()
-                            + ", but '" + clash.get() + "' is already taken — dropping it");
+                            + ", but '" + clash.get() + "' already has it, so it is dropped");
                     continue;
                 }
                 taken.addAll(command.names());

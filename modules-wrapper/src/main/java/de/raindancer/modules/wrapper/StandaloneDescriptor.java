@@ -41,7 +41,7 @@ public final class StandaloneDescriptor {
         this.version = required(version, "version");
         if (!PLUGIN_NAME.matcher(this.name).matches()) {
             throw new IllegalArgumentException(
-                    "a plugin name is letters, digits, dots, dashes and underscores — '" + name + "' is not");
+                    "a plugin name is letters, digits, dots, dashes and underscores, and '" + name + "' is not");
         }
         // Always, and first: a module without RainsCore is a module whose every class is missing.
         dependencies.put("RainsCore", true);
