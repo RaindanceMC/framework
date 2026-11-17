@@ -93,6 +93,15 @@ public final class ModuleBootstrap implements PluginBootstrap {
             // One /hub (alias /smp): the front door to every module, built from what they report. Core
             // declines every plugin but the first, so any mix of installed plugins still means one hub.
             de.raindancer.core.platform.command.CoreCommands.hub(event.registrar());
+            // And one /preferences (aliases /prefs, /options) and one /travel: a player's own settings and every way to
+            // get somewhere, each in one window, from whatever plugins offer them. Core 2.103.0 or newer.
+            try {
+                de.raindancer.core.platform.command.CoreCommands.preferences(event.registrar());
+                de.raindancer.core.platform.command.CoreCommands.travel(event.registrar());
+            } catch (LinkageError olderCore) {
+                context.getLogger().warn("RainsCore is older than 2.103.0: there is no /preferences or /travel until it"
+                        + " is updated.");
+            }
             // And one /maintenance (aliases /wartung, /wartungsmodus), op-only through rainscore.maintenance.
             de.raindancer.core.platform.command.CoreCommands.maintenance(event.registrar());
             // And one /documents (alias /files): every plugin's settings and texts are kept in the database
